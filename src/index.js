@@ -3,6 +3,13 @@ const http=require('http')
 const express=require('express');
 const socketio=require('socket.io')
 
+const Filter = require('bad-words')
+const filter = new Filter();
+
+// add all voulger word here which is blocking
+filter.addWords('maaderchood','bsdik','gandu');
+
+
 const app=express();
 const server=http.createServer(app)
 const io=socketio(server);
@@ -21,13 +28,19 @@ io.on('connection',(socket)=>{
 
     socket.emit('chat message','Welcome!!')
     socket.broadcast.emit('chat message','New user Joined chat room!!')
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg);
+    socket.on('chat message', (msg,acknowledgement) => {
+        if(filter.isProfane(msg)){
+            io.emit('chat message', 'This msg can not shown its having voulger content');
+            acknowledgement('You are not allowed to use such language')
+        }else{
+            io.emit('chat message', msg);
+            acknowledgement('Delivered')
+        }
     });
 
     socket.on('sendLocation',(coords,acknowledgement)=>{
         socket.broadcast.emit('chat message',`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`);
-        acknowledgement('Delivered');
+        acknowledgement('Location Shared');
     })
 
     // socket.emit('countUpdated',count)
