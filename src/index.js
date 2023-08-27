@@ -12,6 +12,7 @@ const publicDirectory=path.join(__dirname,'../public')
 
 app.use(express.static(publicDirectory))
 
+// This function called when new user or instance connected with server
 io.on('connection',()=>{
     console.log("New websocket connection!")
 })
