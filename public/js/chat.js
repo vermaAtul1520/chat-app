@@ -5,17 +5,30 @@ socket.on('messsage',(message)=>{
 })
 
 var messages = document.getElementById('messages');
-var form = document.getElementById('form');
-var input = document.getElementById('input');
+var $messegeform = document.querySelector('#form');
+var $sendLocation=document.querySelector('#send-location');
+var $messageFormButton=$messegeform.querySelector('button');
+var $messageFormInput=$messegeform.querySelector('input');
+// var input = document.getElementById('input');
 
-form.addEventListener('submit', function(e) {
-  e.preventDefault();
-  if (input.value) {
-    socket.emit('chat message', input.value,(msg)=>{
-        console.log(`${msg}`)
-    });
-    input.value = '';
-  }
+$messegeform.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const messege = e.target.input.value;
+    // Disable the button
+    $messageFormButton.setAttribute('disabled','disabled')
+    
+    if(messege){
+        socket.emit('chat message', messege, (msg) => {
+            $messageFormButton.removeAttribute('disabled')
+            $messageFormInput.value = '';
+            $messageFormInput.focus()
+            console.log(`${msg}`)
+        });
+    }else{
+        $messageFormButton.removeAttribute('disabled');
+        console.warn('Enter your text first');
+    }
 });
 
 socket.on('chat message', function(msg) {
@@ -25,17 +38,33 @@ socket.on('chat message', function(msg) {
   window.scrollTo(0, document.body.scrollHeight);
 });
 
-document.querySelector('#send-location').addEventListener('click', () => {
+socket.on('sendLocation', function (msg) {
+    var item = document.createElement('li');
+    var link = document.createElement('a'); // Create a link element
+    link.href = msg; // Set the URL as the href attribute
+    link.textContent = 'My Location'; // Set the link text
+    
+    // Append the link to the list item
+    item.appendChild(link);
+
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+});
+
+
+$sendLocation.addEventListener('click', () => {
     if (!navigator.geolocation) {
         return alert('Geo location is not supported by your browser')
     }
 
+    $sendLocation.setAttribute('disabled','disabled')
     navigator.geolocation.getCurrentPosition((position) => {
         let locationObj = {
             latitude: position?.coords?.latitude,
             longitude: position?.coords?.longitude
         }
         socket.emit('sendLocation', locationObj,(msg)=>{
+            $sendLocation.removeAttribute('disabled');
             console.log('Message sent sucessfully!!',msg)
         });
     })

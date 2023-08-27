@@ -39,7 +39,7 @@ io.on('connection',(socket)=>{
     });
 
     socket.on('sendLocation',(coords,acknowledgement)=>{
-        socket.broadcast.emit('chat message',`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`);
+        io.emit('sendLocation',`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`);
         acknowledgement('Location Shared');
     })
 
