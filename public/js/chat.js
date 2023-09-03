@@ -33,7 +33,7 @@ $messegeform.addEventListener('submit', (e) => {
 
 socket.on('chat message', function(msg) {
   var item = document.createElement('li');
-  item.textContent = msg;
+  item.textContent = msg.text;
   messages.appendChild(item);
   window.scrollTo(0, document.body.scrollHeight);
 });
@@ -41,7 +41,7 @@ socket.on('chat message', function(msg) {
 socket.on('sendLocation', function (msg) {
     var item = document.createElement('li');
     var link = document.createElement('a'); // Create a link element
-    link.href = msg; // Set the URL as the href attribute
+    link.href = msg.url; // Set the URL as the href attribute
     link.textContent = 'My Location'; // Set the link text
     
     // Append the link to the list item
